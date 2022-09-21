@@ -1,0 +1,83 @@
+name: hpct-cluster-bundle-micro
+
+description: |
+  Set up micro cluster.
+
+#variables:
+
+series: jammy
+
+#tags:
+
+applications:
+  hpct-head-node:
+    charm: /home/jdm/projects/canonical/projects/juju/dev/charms/hpct-head-node-operator
+    #channel:
+    series: jammy
+    num_units: 1
+    constraints: cores=2 mem=4G
+
+  hpct-ldap-node:
+    charm: /home/jdm/projects/canonical/projects/juju/dev/charms/hpct-ldap-node-operator
+    series: jammy
+    num_units: 1
+    constraints: cores=2 mem=4G
+
+  hpct-slurm-node:
+    charm: /home/jdm/projects/canonical/projects/juju/dev/charms/hpct-slurm-node-operator
+    series: jammy
+    num_units: 1
+    constraints: cores=2 mem=4G
+
+  hpct-compute-node:
+    charm: /home/jdm/projects/canonical/projects/juju/dev/charms/hpct-compute-node-operator
+    series: jammy
+    num_units: 2
+    constraints: cores=2 mem=8G
+
+  #
+  # subordinates
+  #
+
+  hpct-ldap-server:
+    charm: /home/jdm/projects/canonical/projects/juju/dev/charms/hpct-ldap-server-operator
+    series: jammy
+
+  hpct-ldap-client:
+    charm: /home/jdm/projects/canonical/projects/juju/dev/charms/hpct-ldap-client-operator
+    series: jammy
+
+  hpct-slurm-server:
+    charm: /home/jdm/projects/canonical/projects/juju/dev/charms/hpct-slurm-server-operator
+    series: jammy
+
+  hpct-slurm-client:
+    charm: /home/jdm/projects/canonical/projects/juju/dev/charms/hpct-slurm-client-operator
+    series: jammy
+
+relations:
+# ldap-client, slurm-client
+- - hpct-head-node:ldap-client-ready
+  - hpct-ldap-client:ldap-client-ready
+- - hpct-head-node:slurm-client-ready
+  - hpct-slurm-client:slurm-client-ready
+
+# ldap-client, ldap-server
+- - hpct-ldap-node:ldap-server-ready
+  - hpct-ldap-server:ldap-server-ready
+- - hpct-ldap-node:ldap-client-ready
+  - hpct-ldap-client:ldap-client-ready
+
+# ldap-client, slurm-client, slurm-server
+- - hpct-slurm-node:ldap-client-ready
+  - hpct-ldap-client:ldap-client-ready
+- - hpct-slurm-node:slurm-client-ready
+  - hpct-slurm-client:slurm-client-ready
+- - hpct-slurm-node:slurm-server-ready
+  - hpct-slurm-server:slurm-server-ready
+
+# ldap-client, slurm-client
+- - hpct-compute-node:ldap-client-ready
+  - hpct-ldap-client:ldap-client-ready
+- - hpct-compute-node:slurm-client-ready
+  - hpct-slurm-client:slurm-client-ready
