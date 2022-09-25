@@ -10,27 +10,31 @@ series: jammy
 #tags:
 
 applications:
-  hpct-head-node:
-    charm: /home/jdm/projects/canonical/projects/juju/dev/charms/hpct-head-node-operator
+
+  #
+  # principal
+  #
+  head-node:
+    charm: ./charms/hpct-head-node-operator_ubuntu-22.04-amd64.charm
     #channel:
     series: jammy
     num_units: 1
     constraints: cores=2 mem=4G
 
-  hpct-ldap-node:
-    charm: /home/jdm/projects/canonical/projects/juju/dev/charms/hpct-ldap-node-operator
+  ldap-node:
+    charm: ./charms/hpct-ldap-node-operator_ubuntu-22.04-amd64.charm
     series: jammy
     num_units: 1
     constraints: cores=2 mem=4G
 
-  hpct-slurm-node:
-    charm: /home/jdm/projects/canonical/projects/juju/dev/charms/hpct-slurm-node-operator
+  slurm-node:
+    charm: ./charms/hpct-slurm-node-operator_ubuntu-22.04-amd64.charm
     series: jammy
     num_units: 1
     constraints: cores=2 mem=4G
 
-  hpct-compute-node:
-    charm: /home/jdm/projects/canonical/projects/juju/dev/charms/hpct-compute-node-operator
+  compute-node:
+    charm: ./charms/hpct-compute-node-operator_ubuntu-22.04-amd64.charm
     series: jammy
     num_units: 2
     constraints: cores=2 mem=8G
@@ -39,45 +43,45 @@ applications:
   # subordinates
   #
 
-  hpct-ldap-server:
-    charm: /home/jdm/projects/canonical/projects/juju/dev/charms/hpct-ldap-server-operator
+  ldap-client:
+    charm: ./charms/hpct-ldap-client-operator_ubuntu-22.04-amd64.charm
     series: jammy
 
-  hpct-ldap-client:
-    charm: /home/jdm/projects/canonical/projects/juju/dev/charms/hpct-ldap-client-operator
+  ldap-server:
+    charm: ./charms/hpct-ldap-server-operator_ubuntu-22.04-amd64.charm
     series: jammy
 
-  hpct-slurm-server:
-    charm: /home/jdm/projects/canonical/projects/juju/dev/charms/hpct-slurm-server-operator
+  slurm-client:
+    charm: ./charms/hpct-slurm-client-operator_ubuntu-22.04-amd64.charm
     series: jammy
 
-  hpct-slurm-client:
-    charm: /home/jdm/projects/canonical/projects/juju/dev/charms/hpct-slurm-client-operator
+  slurm-server:
+    charm: ./charms/hpct-slurm-server-operator_ubuntu-22.04-amd64.charm
     series: jammy
 
 relations:
-# ldap-client, slurm-client
-- - hpct-head-node:ldap-client-ready
-  - hpct-ldap-client:ldap-client-ready
-- - hpct-head-node:slurm-client-ready
-  - hpct-slurm-client:slurm-client-ready
+# head-node
+- - head-node:ldap-client-ready
+  - ldap-client:ldap-client-ready
+- - head-node:slurm-client-ready
+  - slurm-client:slurm-client-ready
 
-# ldap-client, ldap-server
-- - hpct-ldap-node:ldap-server-ready
-  - hpct-ldap-server:ldap-server-ready
-- - hpct-ldap-node:ldap-client-ready
-  - hpct-ldap-client:ldap-client-ready
+# ldap-node
+- - ldap-node:ldap-server-ready
+  - ldap-server:ldap-server-ready
+#- - ldap-node:ldap-client-ready
+#  - ldap-client:ldap-client-ready
 
-# ldap-client, slurm-client, slurm-server
-- - hpct-slurm-node:ldap-client-ready
-  - hpct-ldap-client:ldap-client-ready
-- - hpct-slurm-node:slurm-client-ready
-  - hpct-slurm-client:slurm-client-ready
-- - hpct-slurm-node:slurm-server-ready
-  - hpct-slurm-server:slurm-server-ready
+# slurm-node
+- - slurm-node:ldap-client-ready
+  - ldap-client:ldap-client-ready
+- - slurm-node:slurm-client-ready
+  - slurm-client:slurm-client-ready
+- - slurm-node:slurm-server-ready
+  - slurm-server:slurm-server-ready
 
-# ldap-client, slurm-client
-- - hpct-compute-node:ldap-client-ready
-  - hpct-ldap-client:ldap-client-ready
-- - hpct-compute-node:slurm-client-ready
-  - hpct-slurm-client:slurm-client-ready
+# compute-node
+- - compute-node:ldap-client-ready
+  - ldap-client:ldap-client-ready
+- - compute-node:slurm-client-ready
+  - slurm-client:slurm-client-ready
